@@ -1,7 +1,11 @@
 import os
 
 def get_markdown_files(directory):
-    return [f for f in os.listdir(directory) if f.lower().endswith(".md") and os.path.isfile(os.path.join(directory, f))]
+    return sorted(
+        f for f in os.listdir(directory)
+        if f.lower().endswith(".md")
+        and os.path.isfile(os.path.join(directory, f))
+    )
 
 def display_file_list(files):
     for i, f in enumerate(files, start=1):
@@ -15,7 +19,7 @@ def read_markdown_sections(filepath):
     current_section = []
 
     for line in lines:
-        if line.startswith("# "):
+        if line.lstrip().startswith("#"):
             if current_section:
                 sections.append("".join(current_section))
                 current_section = []
@@ -26,15 +30,22 @@ def read_markdown_sections(filepath):
 
     return sections
 
+def get_valid_directory():
+    while True:
+        directory = input("Please give a [[VALID]] directory\n> ").strip()
+        if os.path.isdir(directory):
+            return directory
+        print("Invalid directory. Try again.\n")
+
 def main():
-    directory = input('Please give a [[VALID]] directory\n> ')
+    directory = get_valid_directory()
 
     while True:
         md_files = get_markdown_files(directory)
 
         if not md_files:
-            print("No markdown files found.")
-            return
+            print("No markdown files found.\n")
+            continue
 
         display_file_list(md_files)
 
@@ -54,7 +65,7 @@ def main():
         sections = read_markdown_sections(filepath)
 
         for section in sections:
-            print(section)
+            print("\n" + section)
             while True:
                 cont = input("Display next section? (y/n): ").strip().lower()
                 if cont in ("y", "n"):
