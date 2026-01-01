@@ -1,0 +1,10 @@
+{
+  "directory_prompt": "Please give a [[VALID]] directory",
+  "markdown_extensions": [".md"],
+  "header_prefix": "#",
+  "require_space_after_header": false,
+  "sort_files": true,
+  "restart_message": "--- Restarting file selection ---",
+  "confirm_prompt": "Display next section? (y/n): ",
+  "allow_uppercase_confirm": true
+}
