@@ -6,5 +6,6 @@
   "sort_files": true,
   "restart_message": "--- Restarting file selection ---",
   "confirm_prompt": "Display next section? (y/n): ",
-  "allow_uppercase_confirm": true
+  "allow_uppercase_confirm": true,
+  "section_header_level": 1
 }

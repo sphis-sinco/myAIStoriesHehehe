@@ -1,10 +1,9 @@
 # === CHANGELOG ===
-# v1.2
-# - Added external JSON config file for soft configuration
-# - Made markdown extensions configurable
-# - Made header detection configurable
-# - Added configurable prompts and messages
-# - Optional file sorting via config
+# v1.3
+# - Added proper support for smaller markdown headers (##, ###, etc.)
+# - Reader now splits sections ONLY on level-1 headers ("# ")
+# - Smaller headers are treated as part of the current section
+# - Header level is now configurable via config
 # =================
 
 import os
@@ -28,15 +27,13 @@ def display_file_list(files):
     for i, f in enumerate(files, start=1):
         print(f"[{i}] : {f}")
 
-def is_header(line, config):
-    if not line.lstrip().startswith(config["header_prefix"]):
+def is_section_header(line, config):
+    stripped = line.lstrip()
+    if not stripped.startswith("#"):
         return False
 
-    if config["require_space_after_header"]:
-        prefix_len = len(config["header_prefix"])
-        return line.lstrip().startswith(config["header_prefix"] + " ")
-
-    return True
+    hash_count = len(stripped) - len(stripped.lstrip("#"))
+    return hash_count == config["section_header_level"] and stripped.startswith("#" * hash_count + " ")
 
 def read_markdown_sections(filepath, config):
     with open(filepath, "r", encoding="utf-8") as file:
@@ -46,7 +43,7 @@ def read_markdown_sections(filepath, config):
     current_section = []
 
     for line in lines:
-        if is_header(line, config):
+        if is_section_header(line, config):
             if current_section:
                 sections.append("".join(current_section))
                 current_section = []
