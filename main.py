@@ -1,8 +1,8 @@
 # === CHANGELOG ===
-# v1.6
-# - Replaced sections with a single "story" array of strings
-# - Each line of the story is displayed individually with confirmation
-# - Simplified JSON structure and reader logic
+# v1.7
+# - Changed behavior: display all lines of "story" continuously
+# - Confirmation now occurs only after the entire story
+# - Simplified logic, removed per-line confirmation
 # =================
 
 import os
@@ -26,7 +26,7 @@ def display_file_list(files):
         print(f"[{i}] : {f}")
 
 def confirm_next(config, prompt=None):
-    prompt = prompt or config.get("confirm_prompt", "Display next line? (y/n): ")
+    prompt = prompt or config.get("confirm_prompt", "Continue? (y/n): ")
     while True:
         resp = input(prompt).strip()
         if config.get("allow_uppercase_confirm", True):
@@ -34,11 +34,11 @@ def confirm_next(config, prompt=None):
         if resp in ("y", "n"):
             return resp == "y"
 
-def display_story_lines(story_lines, config):
+def display_story(story_lines):
+    print()
     for line in story_lines:
-        print("\n" + line)
-        if not confirm_next(config):
-            break
+        print(line)
+    print()
 
 def read_json_file(filepath):
     with open(filepath, "r", encoding="utf-8") as f:
@@ -80,7 +80,10 @@ def main():
         print(f"{story_data.get('description', '')}\n")
 
         story_lines = story_data.get("story", [])
-        display_story_lines(story_lines, config)
+        display_story(story_lines)
+
+        # Wait for confirmation AFTER all lines are displayed
+        confirm_next(config)
 
         print("\n" + config.get("restart_message", "--- Restarting file selection ---") + "\n")
 
