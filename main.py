@@ -1,8 +1,8 @@
 # === CHANGELOG ===
-# v1.5
-# - Removed subsections support; now sections are flat
-# - Reads JSON story files with title, description, and flat sections only
-# - Confirmation system preserved for paging through each section
+# v1.6
+# - Replaced sections with a single "story" array of strings
+# - Each line of the story is displayed individually with confirmation
+# - Simplified JSON structure and reader logic
 # =================
 
 import os
@@ -26,7 +26,7 @@ def display_file_list(files):
         print(f"[{i}] : {f}")
 
 def confirm_next(config, prompt=None):
-    prompt = prompt or config.get("confirm_prompt", "Display next section? (y/n): ")
+    prompt = prompt or config.get("confirm_prompt", "Display next line? (y/n): ")
     while True:
         resp = input(prompt).strip()
         if config.get("allow_uppercase_confirm", True):
@@ -34,11 +34,11 @@ def confirm_next(config, prompt=None):
         if resp in ("y", "n"):
             return resp == "y"
 
-def display_section(section, config):
-    print(f"\n=== {section.get('name', 'Unnamed Section')} ===\n")
-    for line in section.get("content", []):
-        print(line)
-    return confirm_next(config)
+def display_story_lines(story_lines, config):
+    for line in story_lines:
+        print("\n" + line)
+        if not confirm_next(config):
+            break
 
 def read_json_file(filepath):
     with open(filepath, "r", encoding="utf-8") as f:
@@ -74,14 +74,13 @@ def main():
             continue
 
         filepath = os.path.join(directory, json_files[index])
-        story = read_json_file(filepath)
+        story_data = read_json_file(filepath)
 
-        print(f"\n# {story.get('title', 'Untitled')}")
-        print(f"{story.get('description', '')}\n")
+        print(f"\n# {story_data.get('title', 'Untitled')}")
+        print(f"{story_data.get('description', '')}\n")
 
-        for section in story.get("sections", []):
-            if not display_section(section, config):
-                break
+        story_lines = story_data.get("story", [])
+        display_story_lines(story_lines, config)
 
         print("\n" + config.get("restart_message", "--- Restarting file selection ---") + "\n")
 

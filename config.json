@@ -3,6 +3,6 @@
   "story_file_extensions": [".json"],
   "sort_files": true,
   "restart_message": "--- Restarting file selection ---",
-  "confirm_prompt": "Display next section? (y/n): ",
+  "confirm_prompt": "Display next line? (y/n): ",
   "allow_uppercase_confirm": true
 }

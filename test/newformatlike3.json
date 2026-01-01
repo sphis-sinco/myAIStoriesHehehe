@@ -1,0 +1,9 @@
+{
+    "title": "Story Title",
+    "description": "Brief description",
+    "story": [
+        "Line 1",
+        "Line 2",
+        "Line 3"
+    ]
+}
