@@ -1,12 +1,12 @@
 # === CHANGELOG ===
-# v1.7
-# - Changed behavior: display all lines of "story" continuously
-# - Confirmation now occurs only after the entire story
-# - Simplified logic, removed per-line confirmation
+# v1.8
+# - Added ability to quit the program gracefully by entering 'q' at any prompt
+# - Works for directory input, file selection, and post-story confirmation
 # =================
 
 import os
 import json
+import sys
 
 CONFIG_FILE = "config.json"
 
@@ -26,9 +26,12 @@ def display_file_list(files):
         print(f"[{i}] : {f}")
 
 def confirm_next(config, prompt=None):
-    prompt = prompt or config.get("confirm_prompt", "Continue? (y/n): ")
+    prompt = prompt or config.get("confirm_prompt", "Press 'y' to continue to file selection, 'n' to quit: ")
     while True:
         resp = input(prompt).strip()
+        if resp.lower() in ("q", "quit"):
+            print("\nExiting program.")
+            sys.exit(0)
         if config.get("allow_uppercase_confirm", True):
             resp = resp.lower()
         if resp in ("y", "n"):
@@ -47,6 +50,9 @@ def read_json_file(filepath):
 def get_valid_directory(config):
     while True:
         directory = input(config.get("directory_prompt", "Please give a [[VALID]] directory") + "\n> ").strip()
+        if directory.lower() in ("q", "quit"):
+            print("\nExiting program.")
+            sys.exit(0)
         if os.path.isdir(directory):
             return directory
         print("Invalid directory.\n")
@@ -64,7 +70,10 @@ def main():
 
         display_file_list(json_files)
 
-        choice = input("Enter the number of the file to read: ").strip()
+        choice = input("Enter the number of the file to read (or 'q' to quit): ").strip()
+        if choice.lower() in ("q", "quit"):
+            print("\nExiting program.")
+            sys.exit(0)
         if not choice.isdigit():
             print("Invalid input.\n")
             continue
