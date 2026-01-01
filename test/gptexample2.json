@@ -1,0 +1,65 @@
+{
+    "title": "A Quiet Evening",
+    "description": "A short episodic story with nested sections, illustrating the JSON structure.",
+    "sections": [
+        {
+            "name": "Section 1.0: Arrival",
+            "content": [
+                "The sun was setting as Mara approached the old inn.",
+                "A chill ran down her spine when she stepped inside."
+            ],
+            "subsections": [
+                {
+                    "name": "Section 1.1: The Reception",
+                    "content": [
+                        "The innkeeper looked up from his ledger, eyes narrowing.",
+                        "\"Good evening,\" he said, voice careful."
+                    ],
+                    "subsections": [
+                        {
+                            "name": "Section 1.1.1: Observing the Room",
+                            "content": [
+                                "Mara noticed the faint smell of burning wood and dust.",
+                                "The room felt smaller than she remembered from the maps."
+                            ],
+                            "subsections": []
+                        }
+                    ]
+                },
+                {
+                    "name": "Section 1.2: Choosing a Room",
+                    "content": [
+                        "Mara chose a room on the second floor, overlooking the courtyard.",
+                        "The staircase creaked as she climbed, echoing in the empty inn."
+                    ],
+                    "subsections": []
+                }
+            ]
+        },
+        {
+            "name": "Section 2.0: Nightfall",
+            "content": [
+                "By the time Mara finished unpacking, darkness had fallen completely.",
+                "The inn was quiet, save for the occasional sound of footsteps in the hall."
+            ],
+            "subsections": [
+                {
+                    "name": "Section 2.1: A Strange Noise",
+                    "content": [
+                        "A soft thumping came from somewhere above.",
+                        "Mara paused, listening carefully, then continued with her tasks."
+                    ],
+                    "subsections": []
+                },
+                {
+                    "name": "Section 2.2: Preparing for Tomorrow",
+                    "content": [
+                        "She laid out her map and notes, planning her route for the next day.",
+                        "Even with the strange noises, she felt a quiet determination."
+                    ],
+                    "subsections": []
+                }
+            ]
+        }
+    ]
+}
