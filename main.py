@@ -1,9 +1,9 @@
 # === CHANGELOG ===
-# v1.3
-# - Added proper support for smaller markdown headers (##, ###, etc.)
-# - Reader now splits sections ONLY on level-1 headers ("# ")
-# - Smaller headers are treated as part of the current section
-# - Header level is now configurable via config
+# v1.4
+# - Switched from markdown files to JSON-based story files
+# - Supports nested sections/subsections
+# - Reads title, description, and sections from JSON
+# - Confirmation system preserved for paging through sections
 # =================
 
 import os
@@ -15,93 +15,88 @@ def load_config():
     with open(CONFIG_FILE, "r", encoding="utf-8") as f:
         return json.load(f)
 
-def get_markdown_files(directory, config):
-    files = [
+def get_json_files(directory):
+    return sorted(
         f for f in os.listdir(directory)
-        if any(f.lower().endswith(ext) for ext in config["markdown_extensions"])
-        and os.path.isfile(os.path.join(directory, f))
-    ]
-    return sorted(files) if config["sort_files"] else files
+        if f.lower().endswith(".json") and os.path.isfile(os.path.join(directory, f))
+    )
 
 def display_file_list(files):
     for i, f in enumerate(files, start=1):
         print(f"[{i}] : {f}")
 
-def is_section_header(line, config):
-    stripped = line.lstrip()
-    if not stripped.startswith("#"):
-        return False
-
-    hash_count = len(stripped) - len(stripped.lstrip("#"))
-    return hash_count == config["section_header_level"] and stripped.startswith("#" * hash_count + " ")
-
-def read_markdown_sections(filepath, config):
-    with open(filepath, "r", encoding="utf-8") as file:
-        lines = file.readlines()
-
-    sections = []
-    current_section = []
-
-    for line in lines:
-        if is_section_header(line, config):
-            if current_section:
-                sections.append("".join(current_section))
-                current_section = []
-        current_section.append(line)
-
-    if current_section:
-        sections.append("".join(current_section))
-
-    return sections
-
-def get_valid_directory(config):
+def confirm_next(config, prompt=None):
+    prompt = prompt or config.get("confirm_prompt", "Display next section? (y/n): ")
     while True:
-        directory = input(config["directory_prompt"] + "\n> ").strip()
-        if os.path.isdir(directory):
-            return directory
-        print("Invalid directory.\n")
-
-def confirm_next(config):
-    while True:
-        resp = input(config["confirm_prompt"]).strip()
-        if config["allow_uppercase_confirm"]:
+        resp = input(prompt).strip()
+        if config.get("allow_uppercase_confirm", True):
             resp = resp.lower()
         if resp in ("y", "n"):
             return resp == "y"
+
+def display_section(section, config):
+    """Recursively display a section and its subsections"""
+    print(f"\n=== {section.get('name', 'Unnamed Section')} ===\n")
+    for line in section.get("content", []):
+        print(line)
+    if not confirm_next(config):
+        return False
+
+    # Handle subsections recursively
+    subsections = section.get("subsections")
+    if subsections:
+        # if it's a dict (single subsection) or list (multiple)
+        if isinstance(subsections, dict):
+            subsections = [subsections]
+        for sub in subsections:
+            if not display_section(sub, config):
+                return False
+    return True
+
+def read_json_file(filepath):
+    with open(filepath, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+def get_valid_directory(config):
+    while True:
+        directory = input(config.get("directory_prompt", "Please give a [[VALID]] directory") + "\n> ").strip()
+        if os.path.isdir(directory):
+            return directory
+        print("Invalid directory.\n")
 
 def main():
     config = load_config()
     directory = get_valid_directory(config)
 
     while True:
-        md_files = get_markdown_files(directory, config)
+        json_files = get_json_files(directory)
 
-        if not md_files:
-            print("No markdown files found.\n")
+        if not json_files:
+            print("No JSON story files found.\n")
             continue
 
-        display_file_list(md_files)
+        display_file_list(json_files)
 
         choice = input("Enter the number of the file to read: ").strip()
-
         if not choice.isdigit():
             print("Invalid input.\n")
             continue
-
         index = int(choice) - 1
-
-        if index < 0 or index >= len(md_files):
+        if index < 0 or index >= len(json_files):
             print("Number out of range.\n")
             continue
 
-        filepath = os.path.join(directory, md_files[index])
-        sections = read_markdown_sections(filepath, config)
+        filepath = os.path.join(directory, json_files[index])
+        story = read_json_file(filepath)
 
-        for section in sections:
-            print("\n" + section)
-            if not confirm_next(config):
+        print(f"\n# {story.get('title', 'Untitled')}")
+        print(f"{story.get('description', '')}\n")
+
+        for section in story.get("sections", []):
+            if not display_section(section, config):
                 break
 
-        print("\n" + config["restart_message"] + "\n")
+        print("\n" + config.get("restart_message", "--- Restarting file selection ---") + "\n")
 
-main()
+if __name__ == "__main__":
+    main()

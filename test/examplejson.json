@@ -1,0 +1,32 @@
+{
+    "title": "My Adventure",
+    "description": "A short episodic story in JSON format.",
+    "sections": [
+        {
+            "name": "Section 1.0",
+            "content": [
+                "You enter a dark room.",
+                "The air smells old and dusty."
+            ],
+            "subsections": {
+                "name": "Section 1.1",
+                "content": [
+                    "A shadow moves across the wall.",
+                    "You feel uneasy."
+                ]
+            }
+        },
+        {
+            "name": "Section 2.0",
+            "content": [
+                "You find a small key on the floor."
+            ],
+            "subsections": {
+                "name": "Section 2.1",
+                "content": [
+                    "It glints faintly under the candlelight."
+                ]
+            }
+        }
+    ]
+}
